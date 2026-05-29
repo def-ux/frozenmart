@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pengeluaran Toko</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#121212;color:#eee;font-family:'Segoe UI',sans-serif;display:flex;justify-content:center;min-height:100vh;padding:10px}
+#app{background:#181818;width:360px;height:480px;border-radius:20px;box-shadow:0 0 15px #222;padding:15px 20px;display:flex;flex-direction:column}
+h1{font-size:1.4rem;margin-bottom:4px}
+#tanggal{color:#aaa;margin-bottom:12px}
+label{display:block;margin-bottom:4px;font-weight:600}
+input{width:100%;padding:8px 12px;border-radius:8px;border:none;background:#222;color:#eee;margin-bottom:8px}
+button{border:none;font-weight:700;border-radius:10px;cursor:pointer;padding:10px;width:100%;margin-bottom:8px}
+#btnTambah{background:#308446;color:#111}
+#btnTambah:disabled{background:#1a3322;cursor:not-allowed}
+table{width:100%;border-collapse:collapse;font-size:0.85rem}
+th{color:#bbb;border-bottom:1px solid #444;text-align:left;padding:4px 6px}
+td{padding:6px 4px;border-bottom:1px solid #333}
+td.aksi{text-align:center}
+.btn-del{background:#a00;color:#fff;border:none;border-radius:6px;width:28px;height:28px;cursor:pointer}
+#total{text-align:right;font-weight:700;color:#308446;margin-top:8px}
+.btm{margin-top:8px}
+#btnKirimWA{background:#308446;color:#111}
+#btnKirimWA:disabled{background:#1a3322;cursor:not-allowed}
+#btnHapus{background:#a00;color:#fff}
+#btnRiwayat{background:#176af7;color:#fff}
+a{text-decoration:none;color:#eee;display:block;text-align:center;margin-top:10px;font-size:0.9rem}
+</style>
+</head>
+<body>
+<div id="app">
+<h1>Pengeluaran Harian - TOKO</h1>
+<div id="tanggal"></div>
+
+<label>Nama Barang</label>
+<input type="text" id="nama" placeholder="Contoh: Gas LPG">
+<label>Nominal (Rp)</label>
+<input type="number" id="nominal" placeholder="0">
+<button id="btnTambah" disabled>+ Tambah Barang</button>
+
+<table>
+<thead><tr><th style="width:10%">No</th><th>Nama</th><th style="width:35%">Nominal</th><th style="width:15%">Aksi</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<div id="total">TOTAL HARI INI: Rp0</div>
+
+<button id="btnKirimWA" disabled>📩 KIRIM KE WHATSAPP</button>
+<button id="btnHapus">🗑️ Hapus Semua</button>
+<button id="btnRiwayat">📋 Riwayat</button>
+
+<a href="index.html">← Kembali ke Home</a>
+</div>
+<script>
+const LS='bungsu_toko';
+let data=JSON.parse(localStorage.getItem(LS))||[];
+const h=['','Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const b=['','Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+let d=new Date();document.getElementById('tanggal').innerText=h[d.getDay()]+', '+d.getDate()+' '+b[d.getMonth()+1]+' '+d.getFullYear();
+function fmt(n){return'Rp'+n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function render(){let m=document.getElementById('tbody');m.innerHTML='';let tot=0;
+data.forEach((x,i)=>{tot+=x.n;let tr=document.createElement('tr');
+tr.innerHTML=`<td style="text-align:center">${i+1}</td><td>${x.nama}</td><td>${fmt(x.nominal)}</td><td class="aksi"><button class="btn-del" onclick="del(${i})">🗑️</button></td>`;m.appendChild(tr);});
+document.getElementById('total').innerText='TOTAL HARI INI: '+fmt(tot);document.getElementById('btnKirimWA').disabled=data.length===0;}
+function del(i){if(confirm('Hapus "'+data[i].nama+'"?')){data.splice(i,1);localStorage.setItem(LS,JSON.stringify(data));render();}}
+function up(){let n=document.getElementById('nama').value.trim(),no=parseInt(document.getElementById('nominal').value)||0;document.getElementById('btnTambah').disabled=!n||no<=0;}
+document.getElementById('nama').addEventListener('input

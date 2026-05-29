@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BUNGSU MART - Pengeluaran Sarapan</title>
+<style>
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+    color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 10px;
+  }
+  #app {
+    background-color: #181818;
+    width: 360px;
+    height: 480px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px #222;
+    display: flex;
+    flex-direction: column;
+    padding: 15px 20px;
+  }
+  header {
+    margin-bottom: 10px;
+  }
+  header h1 {
+    margin: 0; font-weight: 700; font-size: 1.8rem;
+  }
+  header small {
+    color: #888;
+  }
+  #tanggal {
+    margin: 4px 0 20px;
+    font-weight: 500;
+    color: #aaa;
+  }
+
+  /* Form */
+  label {
+    display: block;
+    margin-bottom: 4px;
+  }
+  #namaBarang, #nominal {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background-color: #222;
+    color: #eee;
+    margin-bottom: 12px;
+  }
+
+  #btnTambah {
+    background-color: #cc6c23;
+    border: none;
+    padding: 10px;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    color: #111;
+    transition: background-color 0.25s;
+  }
+  #btnTambah:hover:not(:disabled) {
+    background-color: #e07d3f;
+  }
+  #btnTambah:disabled {
+    background-color: #804911;
+    cursor: not-allowed;
+  }
+
+  /* Table daftar pengeluaran */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  thead {
+    color: #bbb;
+  }
+  thead th {
+    border-bottom: 1px solid #444;
+    text-align: left;
+    padding-bottom: 8px;
+  }
+  tbody tr {
+    border-bottom: 1px solid #333;
+  }
+  tbody td {
+    padding: 6px 4px;
+  }
+  tbody td.aksi {
+    text-align: center;
+  }
+  .btn-delete {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    background-color: #a00;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    transition: background-color 0.2s;
+  }
+  .btn-delete:hover {
+    background-color: #e00;
+  }
+
+  /* Total */
+  #totalContainer {
+    margin-top: 14px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-align: right;
+    color: #cc6c23;
+  }
+
+  /* Tombol footer */
+  #btnKirimWA, #btnHapusSemua, #btnRiwayat {
+    border: none;
+    font-weight: 700;
+    border-radius: 15px;
+    cursor: pointer;
+    padding: 12px 0;
+    font-size: 1rem;
+    margin-top: 8px;
+    width: 100%;
+    user-select: none;
+  }
+  #btnKirimWA {
+    background-color: #cc6c23;
+    color: #111;
+  }
+  #btnKirimWA:hover:not(:disabled) {
+    background-color: #e07d3f;
+  }
+  #btnKirimWA:disabled {
+    background-color: #804911;
+    cursor: not-allowed;
+  }
+  #btnHapusSemua {
+    background-color: #a00;
+    color: white;
+  }
+  #btnHapusSemua:hover {
+    background-color: #e00;
+  }
+  #btnRiwayat {
+    background-color: #176af7;
+    color: white;
+  }
+  #btnRiwayat:hover {
+    filter: brightness(1.15);
+  }
+
+</style>
+</head>
+<body>
+<div id="app" role="main" aria-label="Halaman Pengeluaran Sarapan Bungsu Mart">
+
+  <header>
+    <h1>Pengeluaran Harian - SARAPAN</h1>
+    <small id="tanggal" aria-live="polite" aria-atomic="true"></small>
+  </header>
+
+  <label for="namaBarang">Nama Barang</label>
+  <input type="text" id="namaBarang" placeholder="Contoh: Telur" aria-describedby="descNama" autocomplete="off" />
+  <small id="descNama" style="color: #666; margin-bottom:10px;">Masukkan nama barang pengeluaran</small>
+
+  <label for="nominal">Nominal (Rp)</label>
+  <input type="number" id="nominal" min="0" placeholder="0" aria-describedby="descNominal" />
+  <small id="descNominal" style="color: #666; margin-bottom:12px;">Masukkan nominal pengeluaran</small>
+
+  <button id="btnTambah" disabled>+ Tambah Barang</button>
+
+  <section aria-label="Daftar Pengeluaran Sarapan" style="margin-top: 12px; flex-grow: 1; overflow-y: auto;">
+    <table aria-describedby="tabelDesc">
+      <thead>
+        <tr>
+          <th style="width: 10%;">No</th>
+          <th>Nama Barang</th>
+          <th style="width: 35%;">Nominal</th>
+          <th style="width: 15%;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="bodyTabel"></tbody>
+    </table>
+    <div id="tabelDesc" hidden>
+      Daftar pengeluaran sarapan dengan kolom nomor, nama barang, nominal, dan tombol hapus.
+    </div>
+  </section>
+
+  <div id="totalContainer" aria-live="polite" aria-atomic="true">TOTAL HARI INI: Rp0</div>
+
+  <button id="btnKirimWA" disabled aria-disabled="true" aria-label="Kirim laporan pengeluaran sarapan ke WhatsApp">📩 KIRIM KE WHATSAPP</button>
+  <button id="btnHapusSemua" aria-label="Hapus semua pengeluaran sarapan">🗑️ Hapus Semua</button>
+  <button id="btnRiwayat" aria-label="Lihat riwayat data pengeluaran sarapan">📋 Riwayat</button>
+  
+</div>
+
+<script>
+  // Format Tanggal Bahasa Indonesia
+  function formatTanggalIndo(tanggal) {
+    const hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const bulanArr = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const hariName = hariArr[tanggal.getDay()];
+    const day = tanggal.getDate();
+    const month = bulanArr[tanggal.getMonth()];
+    const year = tanggal.getFullYear();
+    return `${hariName}, ${day} ${month} ${year}`;
+  }
+
+  // Format Rupiah
+  function formatRupiah(number) {
+    return 'Rp' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  // LocalStorage Key
+  const STORAGE_KEY = 'bungsu_mart_pengeluaran_sarapan';
+
+  // Elements
+  const tanggalEl = document.getElementById('tanggal');
+  const namaBarangInp = document.getElementById('namaBarang');
+  const nominalInp = document.getElementById('nominal');
+  const btnTambah = document.getElementById('btnTambah');
+  const bodyTabel = document.getElementById('bodyTabel');
+  const totalContainer = document.getElementById('totalContainer');
+  const btnKirimWA = document.getElementById('btnKirimWA');
+  const btnHapusSemua = document.getElementById('btnHapusSemua');
+  const btnRiwayat = document.getElementById('btnRiwayat');
+
+  // Data
+  let pengeluaranSarapan = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+  // Tampilkan tanggal hari ini
+  const now = new Date();
+  tanggalEl.textContent = formatTanggalIndo(now);
+
+  // Simpan data ke localStorage
+  function saveData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pengeluaranSarapan));
+  }
+
+  // Render tabel pengeluaran
+  function renderTabel() {
+    bodyTabel.innerHTML = '';
+    if(pengeluaranSarapan.length === 0){
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 4;
+      td.style.textAlign = 'center';
+      td.style.color = '#666';
+      td.textContent = 'Belum ada pengeluaran yang dicatat.';
+      tr.appendChild(td);
+      bodyTabel.appendChild(tr);
+    } else {
+      pengeluaranSarapan.forEach((item, index) => {
+        const tr = document.createElement('tr');
+
+        // No
+        const tdNo = document.createElement('td');
+        tdNo.textContent = index + 1;
+        tdNo.style.textAlign = 'center';
+        tr.appendChild(tdNo);
+
+        // Nama Barang
+        const tdNama = document.createElement('td');
+        tdNama.textContent = item.nama;
+        tr.appendChild(tdNama);
+
+        // Nominal
+        const tdNominal = document.createElement('td');
+        tdNominal.textContent = formatRupiah(item.nominal);
+        tr.appendChild(tdNominal);
+
+        // Aksi (hapus)
+        const tdAksi = document.createElement('td');
+        tdAksi.classList.add('aksi');
+
+        const btnDelete = document.createElement('button');
+        btnDelete.classList.add('btn-delete');
+        btnDelete.title = `Hapus pengeluaran ${item.nama}`;
+        btnDelete.innerHTML = '🗑️';
+        btnDelete.type = 'button';
+        btnDelete.addEventListener('click', () => {
+          if(confirm(`Hapus pengeluaran "${item.nama}"?`)){
+            pengeluaranSarapan.splice(index, 1);
+            saveData();
+            renderTabel();
+            updateTotal();
+            updateButtonState();
+          }
+        });
+
+        tdAksi.appendChild(btnDelete);
+        tr.appendChild(tdAksi);
+
+        bodyTabel.appendChild(tr);
+      });
+    }
+  }
+
+  // Hitung dan update total pengeluaran
+  function updateTotal() {
+    let total = 0;
+    pengeluaranSarapan.forEach(item => total += item.nominal);
+    totalContainer.textContent = 'TOTAL HARI INI: ' + formatRupiah(total);
+  }
+
+  // Validasi input enable/disable tombol tambah
+  function validateInput() {
+    const namaVal = namaBarangInp.value.trim();
+    const nominalVal = parseInt(nominalInp.value, 10);
+    return namaVal !== '' && !isNaN(nominalVal) && nominalVal > 0;
+  }
+
+  // Update tombol tambah dan kirim WA
+  function updateButtonState() {
+    btnTambah.disabled = !validateInput();
+    btnKirimWA.disabled = pengeluaranSarapan.length === 0;
+    btnKirimWA.setAttribute('aria-disabled', btnKirimWA.disabled);
+  }
+
+  // Event tombol tambah
+  btnTambah.addEventListener('click', () => {
+    if(!validateInput()) return;
+    const nama = namaBarangInp.value.trim();
+    const nominal = parseInt(nominalInp.value, 10);
+
+    pengeluaranSarapan.push({nama, nominal});
+    saveData();
+    renderTabel();
+    updateTotal();
+    updateButtonState();
+
+    namaBarangInp.value = '';
+    nominalInp.value = '';
+    namaBarangInp.focus();
+  });
+
+  namaBarangInp.addEventListener('input', updateButtonState);
+  nominalInp.addEventListener('input', updateButtonState);
+
+  // Fungsi membuat tabel text untuk WhatsApp
+  function buatTabelWA(data, tanggal) {
+    let text = `🍳 LAPORAN PENGELUARAN SARAPAN\n${tanggal}\n==============================\n`;
+    text += 'No | Barang      | Nominal\n';
+    text += '------------------------------\n';
+    data.forEach((item, i) => {
+      const no = i + 1;
+      const nama = item.nama.length > 12 ? item.nama.slice(0, 12) : item.nama.padEnd(12, ' ');
+      const nom = 'Rp' + item.nominal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') .padStart(10, ' ');
+      text += `${no}  | ${nama} | ${nom}\n`;
+    });
+    const totalNominal = data.reduce((sum, i) => sum + i.nominal, 0);
+    text += `\nTOTAL : ${formatRupiah(totalNominal)}\n`;
+    text += '==============================\n';
+    text += 'Dicatat oleh : Kasir\n';
+    return text;
+  }
+
+  // Tombol kirim ke WhatsApp
+  btnKirimWA.addEventListener('click', () => {
+    if(pengeluaranSarapan.length === 0) return alert('Belum ada pengeluaran sarapan yang dicatat.');
+    
+    const tanggalLaporan = formatTanggalIndo(now);
+    const pesanWA = buatTabelWA(pengeluaranSarapan, tanggalLaporan);
+    const waURL = `https://wa.me/?text=${encodeURIComponent(pesanWA)}`;
+    window.open(waURL, '_blank');
+  });
+
+  // Tombol hapus semua
+  btnHapusSemua.addEventListener('click', () => {
+    if(pengeluaranSarapan.length === 0) return;
+    if(confirm('Hapus semua pengeluaran sarapan?')){
+      pengeluaranSarapan = [];
+      saveData();
+      renderTabel();
+      updateTotal();
+      updateButtonState();
+    }
+  });
+
+  // Tombol riwayat (belum dibuat halaman riwayat, hanya alert)
+  btnRiwayat.addEventListener('click', () => {
+    alert('Fitur Riwayat Data belum diimplementasikan di demo ini.');
+  });
+
+  // Inisialisasi render awal
+  renderTabel();
+  updateTotal();
+  updateButtonState();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barang Sold Out</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#121212;color:#eee;font-family:'Segoe UI',sans-serif;display:flex;justify-content:center;min-height:100vh;padding:10px}
+#app{background:#181818;width:360px;height:480px;border-radius:20px;box-shadow:0 0 15px #222;padding:15px 20px;display:flex;flex-direction:column}
+h1{font-size:1.6rem;margin-bottom:4px}
+#tanggal{color:#aaa;margin-bottom:12px}
+label{color:#6a4c93;font-weight:600;display:block;margin-bottom:4px}
+input{width:100%;padding:8px 12px;border-radius:8px;border:none;background:#222;color:#eee;margin-bottom:8px}
+button{border:none;font-weight:700;border-radius:10px;cursor:pointer;padding:10px;width:100%;margin-bottom:8px}
+#btnSimpan{background:#6a4c93;color:#fff}
+#btnSimpan:disabled{background:#3a2a4a;cursor:not-allowed}
+.list{flex:1;overflow-y:auto;padding-right:4px}
+.item{display:flex;justify-content:space-between;align-items:center;background:#222;margin-bottom:8px;padding:8px 10px;border-radius:10px}
+.item-left{display:flex;align-items:center;gap:10px}
+.btn-plus,.btn-del{width:28px;height:28px;border:none;border-radius:6px;font-weight:700;cursor:pointer}
+.btn-plus{background:#6a4c93;color:#fff}
+.btn-del{background:#a00;color:#fff;font-size:14px}
+#listHabis{margin-top:10px}
+#listHabis h3{color:#888;font-size:0.95rem;margin-bottom:6px}
+#listHabis ol{padding-left:20px;max-height:70px;overflow-y:auto}
+.btm{margin-top:8px}
+#btnKirimWA{background:#6a4c93;color:#fff}
+#btnKirimWA:disabled{background:#3a2a4a;cursor:not-allowed}
+#btnHapus{background:#a00;color:#fff}
+#btnUndo{background:#cc7a00;color:#000}
+a{text-decoration:none;color:#eee;display:block;text-align:center;margin-top:10px;font-size:0.9rem}
+</style>
+</head>
+<body>
+<div id="app">
+<h1>Barang Sold Out</h1>
+<div id="tanggal"></div>
+
+<label>Tambah Nama Barang Baru</label>
+<input type="text" id="inNama" placeholder="Contoh: Oris Coklat">
+<button id="btnSimpan" disabled>Simpan Barang</button>
+
+<input type="search" id="cari" placeholder="Cari barang tersimpan...">
+
+<div class="list" id="listTersimpan"></div>
+
+<div id="listHabis">
+<h3>Barang Yang Habis Hari Ini (0)</h3>
+<ol id="olHabis"></ol>
+</div>
+
+<button id="btnKirimWA" disabled>📩 KIRIM KE WHATSAPP</button>
+<button id="btnHapus">🗑️ Hapus Semua</button>
+<button id="btnUndo">↩ Undo Terakhir</button>
+
+<a href="index.html">← Kembali ke Home</a>
+</div>
+<script>
+const LS='bungsu_soldout';const LS2='bungsu_habis';
+let data=JSON.parse(localStorage.getItem(LS))||[];
+let habis=JSON.parse(localStorage.getItem(LS2))||[];
+let undo=[];
+const h=['','Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const b=['','Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+let d=new Date();document.getElementById('tanggal').innerText=h[d.getDay()]+', '+d.getDate()+' '+b[d.getMonth()+1]+' '+d.getFullYear();
+function render(){
+let f=document.getElementById('cari').value.toLowerCase();
+let l=document.getElementById('listTersimpan');
+l.innerHTML='';
+data.filter(x=>x.toLowerCase().includes(f)).forEach((x,i)=>{
+let div=document.createElement('div');div.className='item';
+div.innerHTML=`<div class="item-left"><button class="btn-plus" onclick="addHabis('${x}')">+</button><span>${x}</span></div><button class="btn-del" onclick="hapus(${i})">🗑️</button>`;
+l.appendChild(div);});
+update();}
+function renderHabis(){
+let ol=document.getElementById('olHabis');ol.innerHTML='';habis.forEach((x,i)=>{
+let li=document.createElement('li');li.innerHTML=`${x} <button class="btn-del" style="width:20px;height:20px;font-size:12px" onclick="delHabis(${i})">🗑️</button>`;ol.appendChild(li);});
+document.querySelector('#listHabis h3').innerText=`Barang Yang Habis Hari Ini (${habis.length})`;}
+function addHabis(x){if(!habis.includes(x)){habis.push(x);undo.push({t:'add',v:x});renderHabis();update();}}
+function delHabis(i){undo.push({t:'del',v:habis[i]});habis.splice(i,1);renderHabis();update();}
+function hapus(i){data.splice(i,1);localStorage.setItem(LS,JSON.stringify(data));render();}
+function update(){document.getElementById('btnSimpan').disabled=!document.getElementById('inNama').value.trim();
+document.getElementById('btnKirimWA').disabled=habis.length===0;}
+document.getElementById('inNama').addEventListener('input',update);
+document.getElementById('btnSimpan').addEventListener('click',()=>{
+let v=document.getElementById('inNama').value.trim();
+if(v&&!data.includes(v)){data.push(v);localStorage.setItem(LS,JSON.stringify(data));document.getElementById('inNama').value='';render();}});
+document.getElementById('cari').addEventListener('input',render);
+document.getElementById('btnHapus').addEventListener('click',()=>{if(habis.length){if(confirm('Hapus semua?')){undo.push({t:'clear',v:[...habis]});habis=[];renderHabis();update();}}});
+document.getElementById('btnUndo').addEventListener('click',()=>{
+if(!undo.length)return alert('Tidak ada yang bisa di-undo');
+let u=undo.pop();if(u.t==='add')habis=habis.filter(x=>x!==u.v);else if(u.t==='del')habis.push(u.v);else if(u.t==='clear')habis=u.v;
+localStorage.setItem(LS2,JSON.stringify(habis));renderHabis();update();});
+document.getElementById('btnKirimWA').addEventListener('click',()=>{
+let t=document.getElementById('tanggal').innerText;
+let msg=`📜 LAPORAN BARANG SOLD OUT\n${t}\n===========================\nNo | Nama Barang\n---------------------------\n`;
+habis.forEach((x,i)=>msg+=`${i+1}  | ${x}\n`);
+msg+=`\nTOTAL BARANG : ${habis.length}\nDicatat oleh : Kasir`;
+window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');});
+render();renderHabis();
+</script>
+<script>
+const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+const sekarang = new Date();
+
+document.getElementById('tanggal').innerText =
+`${hari[sekarang.getDay()]}, ${sekarang.getDate()} ${bulan[sekarang.getMonth()]} ${sekarang.getFullYear()}`;
+</script>
+</body>
+</html>
