@@ -19,9 +19,12 @@
   #app {
     background-color: #181818;
     width: 360px;
-    min-height: 480px;
-    max-height: 90vh;
-    overflow-y: auto;
+    height: 480px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px #222;
+    display: flex;
+    flex-direction: column;
+    padding: 15px 20px;
   }
   header {
     margin-bottom: 10px;
@@ -56,7 +59,7 @@
   }
 
   #btnTambah {
-    background-color: #33ff00;
+    background-color: #cc6c23;
     border: none;
     padding: 10px;
     font-weight: 700;
@@ -67,7 +70,7 @@
     transition: background-color 0.25s;
   }
   #btnTambah:hover:not(:disabled) {
-    background-color: #3fe054;
+    background-color: #e07d3f;
   }
   #btnTambah:disabled {
     background-color: #804911;
@@ -175,7 +178,7 @@
   <small id="descNama" style="color: #666; margin-bottom:10px;">Masukkan nama barang pengeluaran</small>
 
   <label for="nominal">Nominal (Rp)</label>
-  <input type="text" id="nominal" placeholder="0"/>
+  <input type="number" id="nominal" min="0" placeholder="0" aria-describedby="descNominal" />
   <small id="descNominal" style="color: #666; margin-bottom:12px;">Masukkan nominal pengeluaran</small>
 
   <button id="btnTambah" disabled>+ Tambah Barang</button>
@@ -206,18 +209,6 @@
 </div>
 
 <script>
-    document.getElementById('nominal').addEventListener('input', function(e){
-    let angka = e.target.value.replace(/\D/g,'');
-
-    if(angka){
-        e.target.value = parseInt(angka).toLocaleString('id-ID');
-    } else {
-        e.target.value = '';
-    }
-
-    updateButtonState();
-});
-
   // Format Tanggal Bahasa Indonesia
   function formatTanggalIndo(tanggal) {
     const hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -329,12 +320,9 @@
   // Validasi input enable/disable tombol tambah
   function validateInput() {
     const namaVal = namaBarangInp.value.trim();
-    const nominalVal = parseInt(
-        nominal.value.replace(/\./g,'')
-    ) || 0;
-
-    return namaVal !== '' && nominalVal > 0;
-}
+    const nominalVal = parseInt(nominalInp.value, 10);
+    return namaVal !== '' && !isNaN(nominalVal) && nominalVal > 0;
+  }
 
   // Update tombol tambah dan kirim WA
   function updateButtonState() {
@@ -344,29 +332,22 @@
   }
 
   // Event tombol tambah
-  // Event tombol tambah
-btnTambah.addEventListener('click', () => {
-    if (!validateInput()) return;
-
+  btnTambah.addEventListener('click', () => {
+    if(!validateInput()) return;
     const nama = namaBarangInp.value.trim();
+    const nominal = parseInt(nominalInp.value, 10);
 
-    const nominal = parseInt(
-        nominalInp.value.replace(/\./g,'')
-    ) || 0;
-
-    pengeluaranTOKO.push({ nama, nominal });
-
+    pengeluaranTOKO.push({nama, nominal});
     saveData();
     renderTabel();
     updateTotal();
+    updateButtonState();
 
-    // reset input
     namaBarangInp.value = '';
     nominalInp.value = '';
     namaBarangInp.focus();
+  });
 
-    updateButtonState();
-});
   namaBarangInp.addEventListener('input', updateButtonState);
   nominalInp.addEventListener('input', updateButtonState);
 
