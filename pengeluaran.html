@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>BUNGSU MART - Pengeluaran toko</title>
+<title>BUNGSU MART - Pengeluaran TOKO</title>
 <style>
   body {
     margin: 0; padding: 0;
@@ -166,10 +166,10 @@
 </style>
 </head>
 <body>
-<div id="app" role="main" aria-label="Halaman Pengeluaran toko Bungsu Mart">
+<div id="app" role="main" aria-label="Halaman Pengeluaran TOKO Bungsu Mart">
 
   <header>
-    <h1>Pengeluaran Harian - toko</h1>
+    <h1>Pengeluaran Harian - TOKO</h1>
     <small id="tanggal" aria-live="polite" aria-atomic="true"></small>
   </header>
 
@@ -178,12 +178,12 @@
   <small id="descNama" style="color: #666; margin-bottom:10px;">Masukkan nama barang pengeluaran</small>
 
   <label for="nominal">Nominal (Rp)</label>
-  <input type="number" id="nominal" min="0" placeholder="0" aria-describedby="descNominal" />
+  <input type="text" id="nominal" placeholder="0"/>
   <small id="descNominal" style="color: #666; margin-bottom:12px;">Masukkan nominal pengeluaran</small>
 
   <button id="btnTambah" disabled>+ Tambah Barang</button>
 
-  <section aria-label="Daftar Pengeluaran toko" style="margin-top: 12px; flex-grow: 1; overflow-y: auto;">
+  <section aria-label="Daftar Pengeluaran TOKO" style="margin-top: 12px; flex-grow: 1; overflow-y: auto;">
     <table aria-describedby="tabelDesc">
       <thead>
         <tr>
@@ -196,19 +196,24 @@
       <tbody id="bodyTabel"></tbody>
     </table>
     <div id="tabelDesc" hidden>
-      Daftar pengeluaran toko dengan kolom nomor, nama barang, nominal, dan tombol hapus.
+      Daftar pengeluaran TOKO dengan kolom nomor, nama barang, nominal, dan tombol hapus.
     </div>
   </section>
 
   <div id="totalContainer" aria-live="polite" aria-atomic="true">TOTAL HARI INI: Rp0</div>
 
-  <button id="btnKirimWA" disabled aria-disabled="true" aria-label="Kirim laporan pengeluaran toko ke WhatsApp">📩 KIRIM KE WHATSAPP</button>
-  <button id="btnHapusSemua" aria-label="Hapus semua pengeluaran toko">🗑️ Hapus Semua</button>
-  <button id="btnRiwayat" aria-label="Lihat riwayat data pengeluaran toko">📋 Riwayat</button>
+  <button id="btnKirimWA" disabled aria-disabled="true" aria-label="Kirim laporan pengeluaran TOKO ke WhatsApp">📩 KIRIM KE WHATSAPP</button>
+  <button id="btnHapusSemua" aria-label="Hapus semua pengeluaran TOKO">🗑️ Hapus Semua</button>
+  <button id="btnRiwayat" aria-label="Lihat riwayat data pengeluaran TOKO">📋 Riwayat</button>
   
 </div>
 
 <script>
+    document.getElementById('nominal').addEventListener('input', function(e){
+    let angka = e.target.value.replace(/\D/g,'');
+
+    e.target.value = angka.replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+});
   // Format Tanggal Bahasa Indonesia
   function formatTanggalIndo(tanggal) {
     const hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -226,7 +231,7 @@
   }
 
   // LocalStorage Key
-  const STORAGE_KEY = 'bungsu_mart_pengeluaran_toko';
+  const STORAGE_KEY = 'bungsu_mart_pengeluaran_TOKO';
 
   // Elements
   const tanggalEl = document.getElementById('tanggal');
@@ -240,7 +245,7 @@
   const btnRiwayat = document.getElementById('btnRiwayat');
 
   // Data
-  let pengeluarantoko = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  let pengeluaranTOKO = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
   // Tampilkan tanggal hari ini
   const now = new Date();
@@ -248,13 +253,13 @@
 
   // Simpan data ke localStorage
   function saveData() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(pengeluarantoko));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pengeluaranTOKO));
   }
 
   // Render tabel pengeluaran
   function renderTabel() {
     bodyTabel.innerHTML = '';
-    if(pengeluarantoko.length === 0){
+    if(pengeluaranTOKO.length === 0){
       const tr = document.createElement('tr');
       const td = document.createElement('td');
       td.colSpan = 4;
@@ -264,7 +269,7 @@
       tr.appendChild(td);
       bodyTabel.appendChild(tr);
     } else {
-      pengeluarantoko.forEach((item, index) => {
+      pengeluaranTOKO.forEach((item, index) => {
         const tr = document.createElement('tr');
 
         // No
@@ -294,7 +299,7 @@
         btnDelete.type = 'button';
         btnDelete.addEventListener('click', () => {
           if(confirm(`Hapus pengeluaran "${item.nama}"?`)){
-            pengeluarantoko.splice(index, 1);
+            pengeluaranTOKO.splice(index, 1);
             saveData();
             renderTabel();
             updateTotal();
@@ -313,21 +318,21 @@
   // Hitung dan update total pengeluaran
   function updateTotal() {
     let total = 0;
-    pengeluarantoko.forEach(item => total += item.nominal);
+    pengeluaranTOKO.forEach(item => total += item.nominal);
     totalContainer.textContent = 'TOTAL HARI INI: ' + formatRupiah(total);
   }
 
   // Validasi input enable/disable tombol tambah
   function validateInput() {
     const namaVal = namaBarangInp.value.trim();
-    const nominalVal = parseInt(nominalInp.value, 10);
+    const nominalVal = parseInt(nominal.value.replace(/\./g,''))
     return namaVal !== '' && !isNaN(nominalVal) && nominalVal > 0;
   }
 
   // Update tombol tambah dan kirim WA
   function updateButtonState() {
     btnTambah.disabled = !validateInput();
-    btnKirimWA.disabled = pengeluarantoko.length === 0;
+    btnKirimWA.disabled = pengeluaranTOKO.length === 0;
     btnKirimWA.setAttribute('aria-disabled', btnKirimWA.disabled);
   }
 
@@ -335,9 +340,8 @@
   btnTambah.addEventListener('click', () => {
     if(!validateInput()) return;
     const nama = namaBarangInp.value.trim();
-    const nominal = parseInt(nominalInp.value, 10);
-
-    pengeluarantoko.push({nama, nominal});
+    const nominal = parseInt(nominal.value.replace(/\./g,''))
+    pengeluaranTOKO.push({nama, nominal});
     saveData();
     renderTabel();
     updateTotal();
@@ -353,7 +357,7 @@
 
   // Fungsi membuat tabel text untuk WhatsApp
   function buatTabelWA(data, tanggal) {
-    let text = `🍳 LAPORAN PENGELUARAN toko\n${tanggal}\n==============================\n`;
+    let text = `🍳 LAPORAN PENGELUARAN TOKO\n${tanggal}\n==============================\n`;
     text += 'No | Barang      | Nominal\n';
     text += '------------------------------\n';
     data.forEach((item, i) => {
@@ -371,19 +375,19 @@
 
   // Tombol kirim ke WhatsApp
   btnKirimWA.addEventListener('click', () => {
-    if(pengeluarantoko.length === 0) return alert('Belum ada pengeluaran toko yang dicatat.');
+    if(pengeluaranTOKO.length === 0) return alert('Belum ada pengeluaran TOKO yang dicatat.');
     
     const tanggalLaporan = formatTanggalIndo(now);
-    const pesanWA = buatTabelWA(pengeluarantoko, tanggalLaporan);
+    const pesanWA = buatTabelWA(pengeluaranTOKO, tanggalLaporan);
     const waURL = `https://wa.me/?text=${encodeURIComponent(pesanWA)}`;
     window.open(waURL, '_blank');
   });
 
   // Tombol hapus semua
   btnHapusSemua.addEventListener('click', () => {
-    if(pengeluarantoko.length === 0) return;
-    if(confirm('Hapus semua pengeluaran toko?')){
-      pengeluarantoko = [];
+    if(pengeluaranTOKO.length === 0) return;
+    if(confirm('Hapus semua pengeluaran TOKO?')){
+      pengeluaranTOKO = [];
       saveData();
       renderTabel();
       updateTotal();
