@@ -19,12 +19,9 @@
   #app {
     background-color: #181818;
     width: 360px;
-    height: 480px;
-    border-radius: 20px;
-    box-shadow: 0 0 15px #222;
-    display: flex;
-    flex-direction: column;
-    padding: 15px 20px;
+    min-height: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
   }
   header {
     margin-bottom: 10px;
@@ -212,8 +209,15 @@
     document.getElementById('nominal').addEventListener('input', function(e){
     let angka = e.target.value.replace(/\D/g,'');
 
-    e.target.value = angka.replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+    if(angka){
+        e.target.value = parseInt(angka).toLocaleString('id-ID');
+    } else {
+        e.target.value = '';
+    }
+
+    updateButtonState();
 });
+
   // Format Tanggal Bahasa Indonesia
   function formatTanggalIndo(tanggal) {
     const hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
