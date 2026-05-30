@@ -340,7 +340,8 @@
   btnTambah.addEventListener('click', () => {
     if(!validateInput()) return;
     const nama = namaBarangInp.value.trim();
-    const nominal = parseInt(nominal.value.replace(/\./g,''))
+    const nominal = parseInt(nominalInp.value, 10);
+
     pengeluaranTOKO.push({nama, nominal});
     saveData();
     renderTabel();
