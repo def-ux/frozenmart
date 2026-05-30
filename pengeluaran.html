@@ -325,9 +325,12 @@
   // Validasi input enable/disable tombol tambah
   function validateInput() {
     const namaVal = namaBarangInp.value.trim();
-    const nominalVal = parseInt(nominal.value.replace(/\./g,''))
-    return namaVal !== '' && !isNaN(nominalVal) && nominalVal > 0;
-  }
+    const nominalVal = parseInt(
+        nominal.value.replace(/\./g,'')
+    ) || 0;
+
+    return namaVal !== '' && nominalVal > 0;
+}
 
   // Update tombol tambah dan kirim WA
   function updateButtonState() {
@@ -337,22 +340,29 @@
   }
 
   // Event tombol tambah
-  btnTambah.addEventListener('click', () => {
-    if(!validateInput()) return;
-    const nama = namaBarangInp.value.trim();
-    const nominal = parseInt(nominalInp.value, 10);
+  // Event tombol tambah
+btnTambah.addEventListener('click', () => {
+    if (!validateInput()) return;
 
-    pengeluaranTOKO.push({nama, nominal});
+    const nama = namaBarangInp.value.trim();
+
+    const nominal = parseInt(
+        nominalInp.value.replace(/\./g,'')
+    ) || 0;
+
+    pengeluaranTOKO.push({ nama, nominal });
+
     saveData();
     renderTabel();
     updateTotal();
-    updateButtonState();
 
+    // reset input
     namaBarangInp.value = '';
     nominalInp.value = '';
     namaBarangInp.focus();
-  });
 
+    updateButtonState();
+});
   namaBarangInp.addEventListener('input', updateButtonState);
   nominalInp.addEventListener('input', updateButtonState);
 
