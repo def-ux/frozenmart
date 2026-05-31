@@ -78,25 +78,28 @@
   }
 
   /* Table daftar pengeluaran */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-  }
-  thead {
-    color: #bbb;
-  }
-  thead th {
-    border-bottom: 1px solid #444;
-    text-align: left;
-    padding-bottom: 8px;
-  }
-  tbody tr {
-    border-bottom: 1px solid #333;
-  }
-  tbody td {
-    padding: 6px 4px;
-  }
+  table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:15px;
+}
+thead{
+  position:sticky;
+  top:0;
+  background:#181818;
+  color:#bbb;
+}
+th,td{
+  padding:10px 6px;
+  border-bottom:1px solid #333;
+  text-align:left;
+}
+tbody tr{
+  background:#1d1d1d;
+}
+tbody tr:nth-child(even){
+  background:#242424;
+}
   tbody td.aksi {
     text-align: center;
   }
@@ -183,7 +186,8 @@
 
   <button id="btnTambah" disabled>+ Tambah Barang</button>
 
-  <section aria-label="Daftar Pengeluaran TOKO" style="margin-top: 12px; flex-grow: 1; overflow-y: auto;">
+  <section aria-label="Daftar Pengeluaran TOKO"
+style="margin-top:12px; max-height:180px; overflow-y:auto;">
     <table aria-describedby="tabelDesc">
       <thead>
         <tr>
@@ -353,21 +357,35 @@
 
   // Fungsi membuat tabel text untuk WhatsApp
   function buatTabelWA(data, tanggal) {
-    let text = `🍳 LAPORAN PENGELUARAN TOKO\n${tanggal}\n==============================\n`;
-    text += 'No | Barang      | Nominal\n';
-    text += '------------------------------\n';
+
+    let text = `📋 LAPORAN PENGELUARAN TOKO
+${tanggal}
+
+┌────┬──────────────────────┬─────────────┐
+│ No │ Nama Barang          │ Nominal     │
+├────┼──────────────────────┼─────────────┤
+`;
+
     data.forEach((item, i) => {
-      const no = i + 1;
-      const nama = item.nama.length > 12 ? item.nama.slice(0, 12) : item.nama.padEnd(12, ' ');
-      const nom = 'Rp' + item.nominal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') .padStart(10, ' ');
-      text += `${no}  | ${nama} | ${nom}\n`;
+        const no = String(i + 1).padEnd(2, ' ');
+        const nama = item.nama.substring(0, 20).padEnd(20, ' ');
+        const nominal = formatRupiah(item.nominal)
+            .replace('Rp', 'Rp ')
+            .padStart(11, ' ');
+
+        text += `│ ${no} │ ${nama} │ ${nominal} │\n`;
     });
+
     const totalNominal = data.reduce((sum, i) => sum + i.nominal, 0);
-    text += `\nTOTAL : ${formatRupiah(totalNominal)}\n`;
-    text += '==============================\n';
-    text += 'Dicatat oleh : Kasir\n';
+
+    text += `├────┴──────────────────────┴─────────────┤
+│ TOTAL : ${formatRupiah(totalNominal).padEnd(35, ' ')}│
+└──────────────────────────────────────────┘
+
+Dicatat oleh : Kasir`;
+
     return text;
-  }
+}
 
   // Tombol kirim ke WhatsApp
   btnKirimWA.addEventListener('click', () => {
