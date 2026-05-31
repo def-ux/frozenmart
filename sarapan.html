@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>BUNGSU MART - Pengeluaran Sarapan</title>
+<title>BUNGSU MART - Pengeluaran SARAPAN</title>
 <style>
   body {
     margin: 0; padding: 0;
@@ -17,15 +17,15 @@
     padding: 10px;
   }
   #app {
-    background-color: #181818;
-    width: 360px;
-    height: 480px;
-    border-radius: 20px;
-    box-shadow: 0 0 15px #222;
-    display: flex;
-    flex-direction: column;
-    padding: 15px 20px;
-  }
+  background-color: #181818;
+  width: 360px;
+  min-height: 100vh;
+  border-radius: 20px;
+  box-shadow: 0 0 15px #222;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 20px 40px;
+}
   header {
     margin-bottom: 10px;
   }
@@ -70,33 +70,36 @@
     transition: background-color 0.25s;
   }
   #btnTambah:hover:not(:disabled) {
-    background-color: #e07d3f;
+    background-color: #f4f800;
   }
   #btnTambah:disabled {
-    background-color: #804911;
+    background-color: #fd0094;
     cursor: not-allowed;
   }
 
   /* Table daftar pengeluaran */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-  }
-  thead {
-    color: #bbb;
-  }
-  thead th {
-    border-bottom: 1px solid #444;
-    text-align: left;
-    padding-bottom: 8px;
-  }
-  tbody tr {
-    border-bottom: 1px solid #333;
-  }
-  tbody td {
-    padding: 6px 4px;
-  }
+  table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:15px;
+}
+thead{
+  position:sticky;
+  top:0;
+  background:#181818;
+  color:#bbb;
+}
+th,td{
+  padding:10px 6px;
+  border-bottom:1px solid #333;
+  text-align:left;
+}
+tbody tr{
+  background:#1d1d1d;
+}
+tbody tr:nth-child(even){
+  background:#242424;
+}
   tbody td.aksi {
     text-align: center;
   }
@@ -138,14 +141,14 @@
     user-select: none;
   }
   #btnKirimWA {
-    background-color: #cc6c23;
+    background-color: #004ddb;
     color: #111;
   }
   #btnKirimWA:hover:not(:disabled) {
     background-color: #e07d3f;
   }
   #btnKirimWA:disabled {
-    background-color: #804911;
+    background-color: #38fa07;
     cursor: not-allowed;
   }
   #btnHapusSemua {
@@ -166,10 +169,10 @@
 </style>
 </head>
 <body>
-<div id="app" role="main" aria-label="Halaman Pengeluaran Sarapan Bungsu Mart">
+<div id="app" role="main" aria-label="Halaman Pengeluaran SARAPAN Bungsu Mart">
 
   <header>
-    <h1>Pengeluaran Harian - SARAPAN</h1>
+    <h1>PENGELUARAN SARAPAN BUNGSU</h1>
     <small id="tanggal" aria-live="polite" aria-atomic="true"></small>
   </header>
 
@@ -183,7 +186,8 @@
 
   <button id="btnTambah" disabled>+ Tambah Barang</button>
 
-  <section aria-label="Daftar Pengeluaran Sarapan" style="margin-top: 12px; flex-grow: 1; overflow-y: auto;">
+ <section aria-label="Daftar Pengeluaran SARAPAN"
+style="margin-top:12px; max-height:250px; overflow-y:auto;">
     <table aria-describedby="tabelDesc">
       <thead>
         <tr>
@@ -196,15 +200,15 @@
       <tbody id="bodyTabel"></tbody>
     </table>
     <div id="tabelDesc" hidden>
-      Daftar pengeluaran sarapan dengan kolom nomor, nama barang, nominal, dan tombol hapus.
+      Daftar pengeluaran SARAPAN dengan kolom nomor, nama barang, nominal, dan tombol hapus.
     </div>
   </section>
 
   <div id="totalContainer" aria-live="polite" aria-atomic="true">TOTAL HARI INI: Rp0</div>
 
-  <button id="btnKirimWA" disabled aria-disabled="true" aria-label="Kirim laporan pengeluaran sarapan ke WhatsApp">📩 KIRIM KE WHATSAPP</button>
-  <button id="btnHapusSemua" aria-label="Hapus semua pengeluaran sarapan">🗑️ Hapus Semua</button>
-  <button id="btnRiwayat" aria-label="Lihat riwayat data pengeluaran sarapan">📋 Riwayat</button>
+  <button id="btnKirimWA" disabled aria-disabled="true" aria-label="Kirim laporan pengeluaran SARAPAN ke WhatsApp">📩 KIRIM KE WHATSAPP</button>
+  <button id="btnHapusSemua" aria-label="Hapus semua pengeluaran SARAPAN">🗑️ Hapus Semua</button>
+  <button id="btnRiwayat" aria-label="Lihat riwayat data pengeluaran SARAPAN">📋 Riwayat</button>
   
 </div>
 
@@ -226,7 +230,7 @@
   }
 
   // LocalStorage Key
-  const STORAGE_KEY = 'bungsu_mart_pengeluaran_sarapan';
+  const STORAGE_KEY = 'bungsu_mart_pengeluaran_SARAPAN';
 
   // Elements
   const tanggalEl = document.getElementById('tanggal');
@@ -240,7 +244,7 @@
   const btnRiwayat = document.getElementById('btnRiwayat');
 
   // Data
-  let pengeluaranSarapan = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  let pengeluaranSARAPAN = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
   // Tampilkan tanggal hari ini
   const now = new Date();
@@ -248,13 +252,13 @@
 
   // Simpan data ke localStorage
   function saveData() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(pengeluaranSarapan));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pengeluaranSARAPAN));
   }
 
   // Render tabel pengeluaran
   function renderTabel() {
     bodyTabel.innerHTML = '';
-    if(pengeluaranSarapan.length === 0){
+    if(pengeluaranSARAPAN.length === 0){
       const tr = document.createElement('tr');
       const td = document.createElement('td');
       td.colSpan = 4;
@@ -264,7 +268,7 @@
       tr.appendChild(td);
       bodyTabel.appendChild(tr);
     } else {
-      pengeluaranSarapan.forEach((item, index) => {
+      pengeluaranSARAPAN.forEach((item, index) => {
         const tr = document.createElement('tr');
 
         // No
@@ -294,7 +298,7 @@
         btnDelete.type = 'button';
         btnDelete.addEventListener('click', () => {
           if(confirm(`Hapus pengeluaran "${item.nama}"?`)){
-            pengeluaranSarapan.splice(index, 1);
+            pengeluaranSARAPAN.splice(index, 1);
             saveData();
             renderTabel();
             updateTotal();
@@ -313,7 +317,7 @@
   // Hitung dan update total pengeluaran
   function updateTotal() {
     let total = 0;
-    pengeluaranSarapan.forEach(item => total += item.nominal);
+    pengeluaranSARAPAN.forEach(item => total += item.nominal);
     totalContainer.textContent = 'TOTAL HARI INI: ' + formatRupiah(total);
   }
 
@@ -327,7 +331,7 @@
   // Update tombol tambah dan kirim WA
   function updateButtonState() {
     btnTambah.disabled = !validateInput();
-    btnKirimWA.disabled = pengeluaranSarapan.length === 0;
+    btnKirimWA.disabled = pengeluaranSARAPAN.length === 0;
     btnKirimWA.setAttribute('aria-disabled', btnKirimWA.disabled);
   }
 
@@ -337,7 +341,7 @@
     const nama = namaBarangInp.value.trim();
     const nominal = parseInt(nominalInp.value, 10);
 
-    pengeluaranSarapan.push({nama, nominal});
+    pengeluaranSARAPAN.push({nama, nominal});
     saveData();
     renderTabel();
     updateTotal();
@@ -353,37 +357,51 @@
 
   // Fungsi membuat tabel text untuk WhatsApp
   function buatTabelWA(data, tanggal) {
-    let text = `🍳 LAPORAN PENGELUARAN SARAPAN\n${tanggal}\n==============================\n`;
-    text += 'No | Barang      | Nominal\n';
-    text += '------------------------------\n';
+
+    let text = `📋 LAP. PENGELUARAN SARAPAN BUNGSU
+${tanggal}
+
+┌────┬──────────────────────┬─────────────┐
+│ No │ Nama Barang          │ Nominal     │
+├────┼──────────────────────┼─────────────┤
+`;
+
     data.forEach((item, i) => {
-      const no = i + 1;
-      const nama = item.nama.length > 12 ? item.nama.slice(0, 12) : item.nama.padEnd(12, ' ');
-      const nom = 'Rp' + item.nominal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') .padStart(10, ' ');
-      text += `${no}  | ${nama} | ${nom}\n`;
+        const no = String(i + 1).padEnd(2, ' ');
+        const nama = item.nama.substring(0, 20).padEnd(20, ' ');
+        const nominal = formatRupiah(item.nominal)
+            .replace('Rp', 'Rp ')
+            .padStart(11, ' ');
+
+        text += `│ ${no} │ ${nama} │ ${nominal} │\n`;
     });
+
     const totalNominal = data.reduce((sum, i) => sum + i.nominal, 0);
-    text += `\nTOTAL : ${formatRupiah(totalNominal)}\n`;
-    text += '==============================\n';
-    text += 'Dicatat oleh : Kasir\n';
+
+    text += `├────┴──────────────────────┴─────────────┤
+│ TOTAL : ${formatRupiah(totalNominal).padEnd(35, ' ')}│
+└──────────────────────────────────────────┘
+
+Dicatat oleh : Kasir`;
+
     return text;
-  }
+}
 
   // Tombol kirim ke WhatsApp
   btnKirimWA.addEventListener('click', () => {
-    if(pengeluaranSarapan.length === 0) return alert('Belum ada pengeluaran sarapan yang dicatat.');
+    if(pengeluaranSARAPAN.length === 0) return alert('Belum ada pengeluaran SARAPAN yang dicatat.');
     
     const tanggalLaporan = formatTanggalIndo(now);
-    const pesanWA = buatTabelWA(pengeluaranSarapan, tanggalLaporan);
+    const pesanWA = buatTabelWA(pengeluaranSARAPAN, tanggalLaporan);
     const waURL = `https://wa.me/?text=${encodeURIComponent(pesanWA)}`;
     window.open(waURL, '_blank');
   });
 
   // Tombol hapus semua
   btnHapusSemua.addEventListener('click', () => {
-    if(pengeluaranSarapan.length === 0) return;
-    if(confirm('Hapus semua pengeluaran sarapan?')){
-      pengeluaranSarapan = [];
+    if(pengeluaranSARAPAN.length === 0) return;
+    if(confirm('Hapus semua pengeluaran SARAPAN?')){
+      pengeluaranSARAPAN = [];
       saveData();
       renderTabel();
       updateTotal();
